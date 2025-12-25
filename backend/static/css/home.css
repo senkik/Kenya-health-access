@@ -1,0 +1,38 @@
+/* Home page specific styles */
+.hero-section {
+    padding: 3rem 0;
+    text-align: center;
+}
+
+.quick-search-container {
+    margin: 2rem 0;
+}
+
+.quick-search-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+.browse-tags {
+    margin-top: 1rem;
+}
+
+.browse-link {
+    background: #0055aa;
+}
+
+.browse-link:hover {
+    background: #004499;
+}
+
+.recent-item {
+    padding: 0.75rem;
+    border-bottom: 1px solid #eee;
+}
+
+.recent-item:last-child {
+    border-bottom: none;
+}

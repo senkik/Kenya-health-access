@@ -8,7 +8,8 @@ router.register(r'facility-types', views.FacilityTypeViewSet)
 router.register(r'services', views.ServiceViewSet)
 router.register(r'facilities', views.FacilityViewSet)
 router.register(r'articles', views.HealthArticleViewSet, basename='article')
-router.register(r'health-tips', views.HealthTipViewSet, basename='health-tip')  # Add this line
+router.register(r'health-tips', views.HealthTipViewSet, basename='health-tip')
+router.register(r'reviews', views.ReviewViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

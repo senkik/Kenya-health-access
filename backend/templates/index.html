@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -5,61 +6,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kenya Health Access</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
 
-        header {
-            background: #006600;
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-        }
 
-        .search-box {
-            margin: 20px 0;
-            padding: 20px;
-            background: #f5f5f5;
-            border-radius: 10px;
-        }
-
-        input,
-        select,
-        button {
-            padding: 10px;
-            margin: 5px;
-            font-size: 16px;
-        }
-
-        .facilities {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-
-        .facility-card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 8px;
-        }
-
-        .emergency {
-            background: #ffebee;
-            padding: 15px;
-            border-radius: 10px;
-        }
-
-        .ussd-box {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/index.css' %}">
 </head>
 
 <body>
@@ -98,70 +47,7 @@
         </div>
     </div>
 
-    <script>
-        // Load counties on page load
-        fetch('/api/counties/')
-            .then(response => response.json())
-            .then(data => {
-                const select = document.getElementById('countySelect');
-                data.forEach(county => {
-                    const option = document.createElement('option');
-                    option.value = county.name;
-                    option.textContent = county.name;
-                    select.appendChild(option);
-                });
-            });
-
-        // Load all facilities on page load
-        function loadAllFacilities() {
-            fetch('/api/facilities/')
-                .then(response => response.json())
-                .then(data => displayFacilities(data.results || data));
-        }
-
-        // Search facilities
-        function searchFacilities() {
-            const searchTerm = document.getElementById('searchInput').value;
-            const county = document.getElementById('countySelect').value;
-
-            let url = '/api/facilities/';
-            if (searchTerm || county) {
-                url = `/api/facilities/search/?q=${searchTerm}&county=${county}`;
-            }
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => displayFacilities(data.results || data));
-        }
-
-        // Display facilities
-        function displayFacilities(facilities) {
-            const container = document.getElementById('facilitiesList');
-            container.innerHTML = '';
-
-            if (!facilities || facilities.length === 0) {
-                container.innerHTML = '<p>No facilities found. Try a different search.</p>';
-                return;
-            }
-
-            facilities.forEach(facility => {
-                const card = document.createElement('div');
-                card.className = 'facility-card';
-                card.innerHTML = `
-                    <h3>${facility.name}</h3>
-                    <p>📍 ${facility.county} ${facility.town ? ', ' + facility.town : ''}</p>
-                    <p>📞 ${facility.phone || 'Phone not available'}</p>
-                    <p>${facility.emergency_available ? '🚨 Emergency Services Available' : ''}</p>
-                    <p>${facility.accepts_nhif ? '✅ Accepts NHIF' : ''}</p>
-                    <small>Type: ${facility.facility_type?.name || 'Healthcare'}</small>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Load facilities on page load
-        loadAllFacilities();
-    </script>
+    <script src="{% static 'js/index.js' %}"></script>
 </body>
 
 </html>

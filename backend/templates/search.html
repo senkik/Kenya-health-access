@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Search Facilities - Kenya Health Access{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/search.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <h1>Find Healthcare Facilities</h1>
+    <p>Search hospitals, clinics, pharmacies across Kenya</p>
+
+    <div class="filters">
+        <div class="filter-group">
+            <label for="searchInput">Search</label>
+            <input type="text" id="searchInput" placeholder="Name, county, town, or service...">
+        </div>
+
+        <div class="filter-group">
+            <label for="countySelect">County</label>
+            <select id="countySelect">
+                <option value="">All Counties</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="facilityTypeSelect">Facility Type</label>
+            <select id="facilityTypeSelect">
+                <option value="">All Types</option>
+                <!-- Will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="nhifFilter">NHIF Accepted</label>
+            <select id="nhifFilter">
+                <option value="">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="display: flex; gap: 1rem;">
+        <button onclick="searchFacilities()" class="btn" style="flex: 1;">Search Facilities</button>
+        <button onclick="resetFilters()" class="btn" style="background: #666;">Reset</button>
+        <button onclick="useMyLocation()" class="btn" style="background: #0055aa;">
+            📍 Near Me
+        </button>
+    </div>
+</div>
+
+<div class="results-header">
+    <h2 id="resultsCount">Loading facilities...</h2>
+    <div>
+        <label for="sortSelect">Sort by: </label>
+        <select id="sortSelect" onchange="searchFacilities()">
+            <option value="name">Name (A-Z)</option>
+            <option value="-name">Name (Z-A)</option>
+            <option value="-created_at">Newest First</option>
+            <option value="created_at">Oldest First</option>
+        </select>
+    </div>
+</div>
+
+<div id="facilitiesContainer">
+    <div class="spinner"></div>
+</div>
+
+<div id="pagination" class="pagination"></div>
+
+<script src="{% static 'js/search.js' %}"></script>
+{% endblock %}

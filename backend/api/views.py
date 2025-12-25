@@ -1,9 +1,12 @@
-from rest_framework import viewsets, filters, status, serializers  # ← IMPORTANT: Added 'serializers'
+from rest_framework import viewsets, filters, status, serializers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
-from facilities.models import Facility, Service, FacilityType
-from facilities.serializers import FacilitySerializer, ServiceSerializer, FacilityTypeSerializer
+from django.core.cache import cache
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from facilities.models import Facility, Service, FacilityType, Review
+from facilities.serializers import FacilitySerializer, ServiceSerializer, FacilityTypeSerializer, ReviewSerializer
 from content.models import HealthArticle, HealthTip
 from locations.models import County
 
@@ -12,7 +15,7 @@ class CountyViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = County.objects.all()
     
     def get_serializer_class(self):
-        # Simple serializer for counties
+        # serializer for counties
         class CountySerializer(serializers.Serializer):
             id = serializers.IntegerField()
             name = serializers.CharField()
@@ -23,11 +26,35 @@ class CountyViewSet(viewsets.ReadOnlyModelViewSet):
     
     filter_backends = [filters.SearchFilter]
     search_fields = ['name']
+    
+    def list(self, request, *args, **kwargs):
+        """List all counties with caching"""
+        cache_key = 'counties_list'
+        cached_data = cache.get(cache_key)
+        
+        if cached_data is not None:
+            return Response(cached_data)
+        
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=3600)  # Cache for 1 hour
+        return response
 
 class FacilityTypeViewSet(viewsets.ReadOnlyModelViewSet):
     """API for facility types"""
     queryset = FacilityType.objects.all()
     serializer_class = FacilityTypeSerializer
+    
+    def list(self, request, *args, **kwargs):
+        """List all facility types with caching"""
+        cache_key = 'facility_types_list'
+        cached_data = cache.get(cache_key)
+        
+        if cached_data is not None:
+            return Response(cached_data)
+        
+        response = super().list(request, *args, **kwargs)
+        cache.set(cache_key, response.data, timeout=3600)  # Cache for 1 hour
+        return response
 
 class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     """API for medical services"""
@@ -78,6 +105,26 @@ class FacilityViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(facilities, many=True)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['post'])
+    def update_availability(self, request, pk=None):
+        """Update facility availability status"""
+        facility = self.get_object()
+        status_value = request.data.get('status')
+        
+        if status_value not in dict(Facility.AVAILABILITY_CHOICES):
+            return Response(
+                {'error': 'Invalid status. Choose from: available, busy, emergency_only, closed'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        facility.availability_status = status_value
+        facility.save()
+        
+        return Response({
+            'status': facility.availability_status,
+            'last_updated': facility.last_status_update
+        })
+
 class HealthArticleViewSet(viewsets.ReadOnlyModelViewSet):
     """API for health articles"""
     queryset = HealthArticle.objects.filter(is_published=True)
@@ -119,3 +166,15 @@ class HealthTipViewSet(viewsets.ReadOnlyModelViewSet):
             serializer = self.get_serializer(tip)
             return Response(serializer.data)
         return Response({'tip': 'No health tips available'})
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    """API for facility reviews"""
+    queryset = Review.objects.filter(is_approved=True)
+    serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields = ['facility']
+    ordering_fields = ['created_at', 'rating']
+
+    def perform_create(self, serializer):
+        # By default reviews are approved in this demo
+        serializer.save(is_approved=True)

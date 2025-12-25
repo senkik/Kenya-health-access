@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home - Kenya Health Access{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="alert alert-info">
+    <h3>📞 USSD Access for All Phones</h3>
+    <p>Dial <strong>*384#</strong> to find healthcare facilities</p>
+    <p>Works on feature phones - no internet required!</p>
+</div>
+
+<div class="card my-2">
+    <h2>Find Healthcare Facilities</h2>
+    <p>Search for hospitals, clinics, pharmacies across Kenya</p>
+
+    <div class="d-flex gap-1 mt-1">
+        <input type="text" id="quickSearch" placeholder="Search by name, county, or town..." class="quick-search-input">
+        <button onclick="quickSearch()" class="btn">Search</button>
+    </div>
+
+    <div class="mt-1">
+        <p>Or browse by:</p>
+        <div class="d-flex gap-1 flex-wrap">
+            <a href="/search/?county=Nairobi" class="btn browse-link">Nairobi</a>
+            <a href="/search/?county=Mombasa" class="btn browse-link">Mombasa</a>
+            <a href="/search/?county=Kisumu" class="btn browse-link">Kisumu</a>
+            <a href="/search/?county=Nakuru" class="btn browse-link">Nakuru</a>
+            <a href="/search/" class="btn">View All Counties</a>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md-grid-cols-2 gap-2 mt-2">
+    <div class="card">
+        <h3>🏥 Recent Facilities</h3>
+        <div id="recentFacilities">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>📚 Health Tips</h3>
+        <div id="healthTips">
+            <div class="spinner"></div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/home.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Facility Details - Kenya Health Access{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/facility_detail.css' %}">
+
+{% endblock %}
+
+{% block content %}
+<div class="facility-detail">
+    <div id="facilityContent">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/search/" class="btn action-btn">← Back to Search</a>
+        <button onclick="window.print()" class="btn action-btn" style="background: #666;">🖨️ Print Details</button>
+        <a href="/" class="btn action-btn">🏠 Back to Home</a>
+    </div>
+</div>
+
+<script src="{% static 'js/facility_detail.js' %}"></script>
+{% endblock %}

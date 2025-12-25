@@ -1,3 +1,16 @@
-<h2>About Kenya Health Access</h2>
-<p>We help Kenyans find healthcare facilities nationwide.</p>
-<p>Access via: Web, USSD (*384#), Coming Soon: Mobile App</p>
+{% extends 'base.html' %}
+
+{% block title %}About - Kenya Health Access{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>About Kenya Health Access</h1>
+    <p class="mt-1">We help Kenyans find healthcare facilities nationwide.</p>
+    <p>Access our services via several platforms:</p>
+    <ul>
+        <li><strong>Web:</strong> Search and filter facilities online.</li>
+        <li><strong>USSD:</strong> Dial <strong>*384#</strong> for access on any phone.</li>
+        <li><strong>Coming Soon:</strong> Dedicated Mobile App.</li>
+    </ul>
+</div>
+{% endblock %}

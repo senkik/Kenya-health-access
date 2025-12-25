@@ -1,26 +1,22 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .models import Facility
+from locations.models import County
 
 def home(request):
-    return HttpResponse("""
-        <h1>🇰🇪 Kenya Health Access</h1>
-        <p>Welcome to Kenya Health Access Platform</p>
-        <ul>
-            <li><a href="/admin/">Admin Panel</a></li>
-            <li><a href="/api/">API Browser</a></li>
-            <li><a href="/api/facilities/">Facilities List</a></li>
-        </ul>
-        <p>USSD: Dial *384#</p>
-    """)
+    """Home page"""
+    return render(request, 'home.html')
+
+def search(request):
+    """Search page"""
+    return render(request, 'search.html')
 
 def facility_detail(request, uuid):
-    facility = get_object_or_404(Facility, uuid=uuid)
-    return HttpResponse(f"""
-        <h1>{facility.name}</h1>
-        <p><strong>County:</strong> {facility.county}</p>
-        <p><strong>Type:</strong> {facility.facility_type.name}</p>
-        <p><strong>Status:</strong> {'Open 24/7' if facility.is_24_hours else 'Check hours'}</p>
-        <br>
-        <a href="/">Back to Home</a>
-    """)
+    """Facility detail page"""
+   
+    return render(request, 'facility_detail.html')
+
+def api_counties(request):
+    """API endpoint for counties (JSON)"""
+    counties = County.objects.all().values('id', 'name', 'code', 'capital')
+    return JsonResponse(list(counties), safe=False)
