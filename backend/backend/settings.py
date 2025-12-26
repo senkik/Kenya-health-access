@@ -14,7 +14,18 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
+NGROK_URL = os.getenv('NGROK_URL', 'sphygmographic-unrising-farah.ngrok-free.dev')
+
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
+
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    'sphygmographic-unrising-farah.ngrok-free.dev',  # Add this
+    '.ngrok-free.dev',  # Allow all ngrok domains
+    '.ngrok.io',        # For other ngrok URLs
+]
+
 
 # Application
 INSTALLED_APPS = [
@@ -189,3 +200,13 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://sphygmographic-unrising-farah.ngrok-free.dev',
+    'https://*.ngrok-free.dev',
+]
+
+# Security settings for ngrok
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True

@@ -48,6 +48,7 @@ Chagua nambari:"""
         """Handle main menu selections"""
         if last_input == "1":
             self.session['menu_level'] = 'search'
+            self.session['search_step'] = 1
             return self.search_menu()
         elif last_input == "2":
             self.session['menu_level'] = 'health_tips'
@@ -71,26 +72,37 @@ Chagua nambari:"""
     
     def handle_search_flow(self, text_array, last_input):
         """Handle search flow with real database queries"""
-        
+        search_step = self.session.get('search_step', 1)
+
         # Level 1: Choose search type
-        if len(text_array) == 2:
+        if search_step == 1:
             if last_input == "1":
                 self.session['search_type'] = 'county'
+                self.session['search_step'] = 2
                 return "CON Andika jina la kaunti yako:"
             elif last_input == "2":
                 self.session['search_type'] = 'facility_name'
+                self.session['search_step'] = 2
                 return "CON Andika jina la hospitali:"
             elif last_input == "3":
                 self.session['search_type'] = 'service'
+                self.session['search_step'] = 2
                 return "CON Andika huduma unayotaka:"
             elif last_input == "4":
                 self.session['search_type'] = 'town'
+                self.session['search_step'] = 2
                 return "CON Andika jina la mji au eneo lako:"
+            elif last_input == "0":
+                return self.main_menu()
             else:
                 return "END Chaguo sio sahihi."
         
         # Level 2: Process search query
-        elif len(text_array) == 3:
+        elif search_step == 2:
+            if last_input == "0":
+                self.session['search_step'] = 1
+                return self.search_menu()
+
             search_type = self.session.get('search_type')
             search_query = last_input
             
@@ -116,10 +128,14 @@ Chagua nambari:"""
                 for fac in facilities[:5]  # Limit to 5 for USSD
             ]
             
+            self.session['search_step'] = 3
             return self.format_search_results()
         
         # Level 3: Facility selection
-        elif len(text_array) == 4:
+        elif search_step == 3:
+            if last_input == "0":
+                self.session['search_step'] = 1
+                return self.search_menu()
             return self.handle_facility_selection(last_input)
         
         return self.error_message()
@@ -242,24 +258,21 @@ Chagua:"""
     
     def handle_health_tips(self, text_array, last_input):
         """Handle health tips selection"""
-        if len(text_array) == 1:
-            categories = {
-                "1": "general",
-                "2": "maternal",
-                "3": "nutrition",
-                "4": "family_planning",
-            }
-            
-            if last_input in categories:
-                category = categories[last_input]
-                tip = self.get_random_health_tip(category)
-                return f"END {tip}\n\nAsante! Kwa ushauri zaidi, piga *384*43149#"
-            elif last_input == "0":
-                self.session['menu_level'] = 'main'
-                return self.main_menu()
-            elif last_input == "00":
-                self.session['menu_level'] = 'main'
-                return self.main_menu()
+        categories = {
+            "1": "general",
+            "2": "maternal",
+            "3": "nutrition",
+            "4": "family_planning",
+        }
+        
+        if last_input in categories:
+            category = categories[last_input]
+            tip = self.get_random_health_tip(category)
+            return f"END {tip}\n\nAsante! Kwa ushauri zaidi, piga *384*43149#"
+        elif last_input == "0":
+            return self.main_menu()
+        elif last_input == "00":
+            return self.main_menu()
         
         return "END Chaguo sio sahihi."
     
