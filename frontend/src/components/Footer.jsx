@@ -44,7 +44,7 @@ export default function Footer() {
                         <div className="space-y-3">
                             <div className="bg-primary-600 px-4 py-3 rounded-lg">
                                 <p className="text-sm font-medium">USSD Access (No Internet Required)</p>
-                                <p className="text-2xl font-bold mt-1">*384#</p>
+                                <p className="text-2xl font-bold mt-1">*384*43149#</p>
                             </div>
                             <p className="text-gray-300 text-sm">
                                 Works on all phones, including feature phones

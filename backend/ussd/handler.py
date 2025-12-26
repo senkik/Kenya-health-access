@@ -202,11 +202,11 @@ Chagua nambari:"""
         
         message = (
             f"HudumaAfya: Maelezo ya {facility['name']}\n"
-            f"📍 Kaunti: {facility['county']}\n"
-            f"🏥 Mji: {facility.get('town', 'N/A')}\n"
-            f"📞 Simu: {facility['phone']}\n"
-            f"🩺 Huduma: {services_str}\n"
-            f"⚡ Hali ya sasa: {status_str}\n\n"
+            f"Kaunti: {facility['county']}\n"
+            f"Mji: {facility.get('town', 'N/A')}\n"
+            f"Simu: {facility['phone']}\n"
+            f"Huduma: {services_str}\n"
+            f"Hali ya sasa: {status_str}\n\n"
             "Asante kwa kutumia HudumaAfya Kenya."
         )
         send_sms(phone, message)
@@ -217,10 +217,11 @@ Chagua nambari:"""
         status_str = facility['status'].replace('_', ' ').title()
         
         return f"""END {facility['name']}
-📍 {facility['county']}
-📞 {facility['phone']}
-🩺 {services_str}
-⚡ Hali: {status_str}
+     Kaunti: {facility['county']}
+     Mji: {facility.get('town', 'N/A')}
+     Simu: {facility['phone']}
+     Huduma: {services_str}
+     Hali ya sasa: {status_str}
 
 Tumekutumia maelezo haya kwa SMS hivi punde.
 
@@ -252,7 +253,7 @@ Chagua:"""
             if last_input in categories:
                 category = categories[last_input]
                 tip = self.get_random_health_tip(category)
-                return f"END {tip}\n\nAsante! Kwa ushauri zaidi, piga *384#"
+                return f"END {tip}\n\nAsante! Kwa ushauri zaidi, piga *384*43149#"
             elif last_input == "0":
                 self.session['menu_level'] = 'main'
                 return self.main_menu()
@@ -301,7 +302,7 @@ Usisite kupiga wakati wa dharura!
         return """END HudumaAfya Kenya 🇰🇪
 Tunasaidia Wakenya kupata huduma za afya karibu nao.
 
-*384# - Bure
+*384*43149# - Bure
 Tovuti: Inajengwa
 
 Asante kwa kuwa miongoni mwetu!
@@ -309,7 +310,7 @@ Asante kwa kuwa miongoni mwetu!
     
     def error_message(self):
         """Default error message"""
-        return "END Samahani, hitilafu imetokea. Tafadhali anza tena kwa kupiga *384#"
+        return "END Samahani, hitilafu imetokea. Tafadhali anza tena kwa kupiga *384*43149#"
 
 
 def create_session(session_id, phone_number):

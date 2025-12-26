@@ -47,7 +47,7 @@ export default function Navbar() {
                     {/* USSD Info */}
                     <div className="hidden lg:flex items-center space-x-2 bg-primary-50 px-4 py-2 rounded-lg">
                         <span className="text-sm font-medium text-primary-700">
-                            📞 Dial *384# for USSD
+                            📞 Dial *384*43149# for USSD
                         </span>
                     </div>
 

@@ -73,7 +73,7 @@ export default function Home() {
                         </div>
                         <div className="bg-white text-secondary-700 px-8 py-4 rounded-lg">
                             <p className="text-sm font-medium">Dial</p>
-                            <p className="text-3xl font-bold">*384#</p>
+                            <p className="text-3xl font-bold">*384*43149#</p>
                         </div>
                     </div>
                 </div>

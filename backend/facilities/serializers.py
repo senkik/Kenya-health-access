@@ -18,6 +18,7 @@ class FacilitySerializer(serializers.ModelSerializer):
         fields = ['id', 'uuid', 'name', 'facility_type', 'facility_type_name', 
                  'county', 'county_name', 'town', 'phone', 'address', 
                  'emergency_available', 'accepts_nhif', 'is_verified',
+                 'latitude', 'longitude',
                  'average_rating', 'total_reviews', 
                  'availability_status', 'last_status_update']
 

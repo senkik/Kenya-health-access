@@ -40,7 +40,7 @@ export default function About() {
                             <div>
                                 <h3 className="font-bold text-gray-900 mb-1">USSD Access</h3>
                                 <p className="text-gray-700">
-                                    Access our platform via USSD (*384#) on any mobile phone, even without
+                                    Access our platform via USSD (*384*43149#) on any mobile phone, even without
                                     internet connection. Perfect for feature phones and areas with limited connectivity.
                                 </p>
                             </div>
@@ -84,9 +84,9 @@ export default function About() {
                         </div>
 
                         <div>
-                            <h3 className="font-bold text-gray-900 mb-2">📱 USSD (*384#)</h3>
+                            <h3 className="font-bold text-gray-900 mb-2">📱 USSD (*384*43149#)</h3>
                             <ol className="list-decimal list-inside space-y-2 text-gray-700 ml-4">
-                                <li>Dial *384# from any mobile phone</li>
+                                <li>Dial *384*43149# from any mobile phone</li>
                                 <li>Follow the menu prompts to search by county or facility type</li>
                                 <li>Receive facility information via SMS</li>
                                 <li>No internet connection required!</li>
@@ -104,7 +104,7 @@ export default function About() {
                     </p>
                     <div className="space-y-2">
                         <p className="text-gray-700">
-                            <span className="font-medium">USSD:</span> Dial *384#
+                            <span className="font-medium">USSD:</span> Dial *384*43149#
                         </p>
                         <p className="text-gray-700">
                             <span className="font-medium">Email:</span> info@kenyahealthaccess.ke

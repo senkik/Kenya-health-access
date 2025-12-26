@@ -26,7 +26,7 @@ def ussd_callback(request):
         return HttpResponse("Method not allowed", status=405)
     
     session_id = request.POST.get("sessionId", "")
-    service_code = request.POST.get("serviceCode", "*384#")
+    service_code = request.POST.get("serviceCode", "*384*43149#")
     phone_number = request.POST.get("phoneNumber", "")
     text = request.POST.get("text", "")
     
