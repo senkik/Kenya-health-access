@@ -386,7 +386,7 @@ export default function FacilityDetail() {
                                         defaultValue={facility.availability_status}
                                         onChange={(e) => {
                                             if (window.confirm(`Change status to ${e.target.value.toUpperCase()}?`)) {
-                                                facilityAPI.updateAvailability(facility.id, e.target.value)
+                                                facilityAPI.updateAvailability(facility.uuid, e.target.value)
                                                     .then(() => {
                                                         queryClient.invalidateQueries(['facility', uuid]);
                                                         alert('Status updated!');

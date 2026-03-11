@@ -143,7 +143,6 @@ Chagua nambari:"""
     def search_facilities(self, search_type, query):
         """Search facilities in database"""
         facilities = Facility.objects.filter(
-            is_verified=True,
             is_active=True
         )
         

@@ -65,27 +65,37 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
 
 class FacilityViewSet(viewsets.ModelViewSet):
     """Main API for healthcare facilities"""
-    queryset = Facility.objects.filter(is_active=True, is_verified=True)
+    queryset = Facility.objects.filter(is_active=True)
     serializer_class = FacilitySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['county', 'facility_type', 'accepts_nhif', 'emergency_available']
-    search_fields = ['name', 'county', 'town', 'address']
+    filterset_fields = ['facility_type', 'accepts_nhif', 'emergency_available']
+    search_fields = ['name', 'town', 'address', 'constituency']
     ordering_fields = ['name', 'created_at']
-    
+    # Use uuid field for detail lookups instead of integer pk
+    lookup_field = 'uuid'
+
+    def get_queryset(self):
+        queryset = Facility.objects.filter(is_active=True)
+        # Support filtering by county name from the frontend
+        county = self.request.query_params.get('county', '')
+        if county:
+            queryset = queryset.filter(county__name__iexact=county)
+        return queryset
+
     @action(detail=False, methods=['get'])
     def search(self, request):
         """Simple search endpoint"""
         query = request.query_params.get('q', '')
         county = request.query_params.get('county', '')
-        
-        facilities = self.get_queryset()
-        
+
+        facilities = Facility.objects.filter(is_active=True)
+
         if query:
             facilities = facilities.filter(name__icontains=query)
-        
+
         if county:
-            facilities = facilities.filter(county__icontains=county)
-        
+            facilities = facilities.filter(county__name__iexact=county)
+
         # Limit to 20 results
         facilities = facilities[:20]
         serializer = self.get_serializer(facilities, many=True)
@@ -101,7 +111,7 @@ class FacilityViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        facilities = self.get_queryset().filter(county__iexact=county)
+        facilities = Facility.objects.filter(is_active=True, county__name__iexact=county)
         serializer = self.get_serializer(facilities, many=True)
         return Response(serializer.data)
 

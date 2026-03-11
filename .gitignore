@@ -36,3 +36,6 @@ ENV/
 # Celery
 celerybeat-schedule*
 
+# Local Data
+facility_data/
+*.sqlite3
