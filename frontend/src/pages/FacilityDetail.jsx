@@ -137,9 +137,9 @@ export default function FacilityDetail() {
                         <div className="card">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Info</h2>
                             <div className="flex flex-wrap gap-3">
-                                {facility.accepts_nhif && (
-                                    <span className="px-4 py-2 bg-green-100 text-green-800 font-medium rounded-lg">
-                                        ✓ NHIF Accepted
+                                {facility.accepts_sha && (
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                                        ✓ SHA Accepted
                                     </span>
                                 )}
                                 {facility.emergency_available && (
@@ -272,10 +272,10 @@ export default function FacilityDetail() {
                         <div className="card">
                             <h2 className="text-xl font-bold text-gray-900 mb-4">Additional Information</h2>
                             <dl className="space-y-3">
-                                {facility.nhif_code && (
-                                    <div>
-                                        <dt className="text-sm font-medium text-gray-500">NHIF Code</dt>
-                                        <dd className="text-gray-900">{facility.nhif_code}</dd>
+                                {facility.sha_code && (
+                                    <div className="sm:col-span-1">
+                                        <dt className="text-sm font-medium text-gray-500">SHA Code</dt>
+                                        <dd className="text-gray-900">{facility.sha_code}</dd>
                                     </div>
                                 )}
                                 {facility.verified_date && (

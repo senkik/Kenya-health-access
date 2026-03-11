@@ -13,7 +13,7 @@ export default function Search() {
         search: searchParams.get('q') || '',
         county: searchParams.get('county') || '',
         facility_type: searchParams.get('type') || '',
-        accepts_nhif: searchParams.get('nhif') || '',
+        accepts_sha: searchParams.get('sha') || '',
         emergency_available: searchParams.get('emergency') || '',
         page: parseInt(searchParams.get('page')) || 1,
     });
@@ -64,7 +64,7 @@ export default function Search() {
             search: '',
             county: '',
             facility_type: '',
-            accepts_nhif: '',
+            accepts_sha: '',
             emergency_available: '',
             page: 1,
         });
@@ -134,16 +134,16 @@ export default function Search() {
                                     </select>
                                 </div>
 
-                                {/* NHIF Filter */}
-                                <div>
-                                    <label className="flex items-center space-x-2 cursor-pointer">
+                                {/* SHA Filter */}
+                                <div className="mt-4">
+                                    <label className="flex items-center">
                                         <input
                                             type="checkbox"
-                                            checked={filters.accepts_nhif === 'true'}
-                                            onChange={(e) => handleFilterChange('accepts_nhif', e.target.checked ? 'true' : '')}
-                                            className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+                                            className="rounded border-gray-300 text-teal-600 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50 h-4 w-4"
+                                            checked={filters.accepts_sha === 'true'}
+                                            onChange={(e) => handleFilterChange('accepts_sha', e.target.checked ? 'true' : '')}
                                         />
-                                        <span className="text-sm text-gray-700">Accepts NHIF</span>
+                                        <span className="ml-2 text-sm text-gray-700">Accepts SHA</span>
                                     </label>
                                 </div>
 

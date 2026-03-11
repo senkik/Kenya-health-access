@@ -68,7 +68,7 @@ class FacilityViewSet(viewsets.ModelViewSet):
     queryset = Facility.objects.filter(is_active=True)
     serializer_class = FacilitySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['facility_type', 'accepts_nhif', 'emergency_available']
+    filterset_fields = ['facility_type', 'accepts_sha', 'emergency_available']
     search_fields = ['name', 'town', 'address', 'constituency']
     ordering_fields = ['name', 'created_at']
     # Use uuid field for detail lookups instead of integer pk

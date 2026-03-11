@@ -77,7 +77,7 @@ export default function About() {
                             <h3 className="font-bold text-gray-900 mb-2">🌐 Web Platform</h3>
                             <ol className="list-decimal list-inside space-y-2 text-gray-700 ml-4">
                                 <li>Visit our website and use the search bar to find facilities</li>
-                                <li>Filter by county, facility type, services, or NHIF acceptance</li>
+                                <li>Filter by county, facility type, services, or SHA acceptance</li>
                                 <li>View detailed information about each facility</li>
                                 <li>Get directions or call facilities directly from the platform</li>
                             </ol>

@@ -27,14 +27,14 @@ export default function FacilityCard({ facility }) {
                 {/* Availability Badge */}
                 <div className="mt-2">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border ${facility.availability_status === 'available' ? 'bg-green-50 text-green-700 border-green-200' :
-                            facility.availability_status === 'busy' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
-                                facility.availability_status === 'emergency_only' ? 'bg-orange-50 text-orange-700 border-orange-200' :
-                                    'bg-gray-50 text-gray-700 border-gray-200'
+                        facility.availability_status === 'busy' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                            facility.availability_status === 'emergency_only' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                'bg-gray-50 text-gray-700 border-gray-200'
                         }`}>
                         <span className={`h-1.5 w-1.5 rounded-full mr-1.5 ${facility.availability_status === 'available' ? 'bg-green-400' :
-                                facility.availability_status === 'busy' ? 'bg-yellow-400' :
-                                    facility.availability_status === 'emergency_only' ? 'bg-orange-400' :
-                                        'bg-gray-400'
+                            facility.availability_status === 'busy' ? 'bg-yellow-400' :
+                                facility.availability_status === 'emergency_only' ? 'bg-orange-400' :
+                                    'bg-gray-400'
                             }`}></span>
                         {facility.availability_status?.replace('_', ' ').toUpperCase() || 'AVAILABLE'}
                     </span>
@@ -85,9 +85,9 @@ export default function FacilityCard({ facility }) {
 
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mt-4">
-                {facility.accepts_nhif && (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
-                        ✓ NHIF Accepted
+                {facility.accepts_sha && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        ✓ SHA Accepted
                     </span>
                 )}
                 {facility.emergency_available && (
