@@ -210,3 +210,18 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True
+
+
+# Allow your Vercel frontend
+CORS_ALLOWED_ORIGINS = [
+    "https://kenya-health-access.vercel.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+]
+
+ALLOWED_HOSTS = [
+    'kenya-health-api.onrender.com',
+    '.onrender.com',
+    'localhost',
+    '127.0.0.1'
+]
