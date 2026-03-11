@@ -39,3 +39,4 @@ celerybeat-schedule*
 # Local Data
 facility_data/
 *.sqlite3
+.conda/
