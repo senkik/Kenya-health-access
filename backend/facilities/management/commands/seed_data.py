@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 'phone': '020-2726300',
                 'emergency_available': True,
                 'ambulance_available': True,
-                'accepts_nhif': True,
+                'accepts_sha': True,
                 'is_verified': True,
             },
             {
@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 'phone': '053-2033471',
                 'emergency_available': True,
                 'ambulance_available': True,
-                'accepts_nhif': True,
+                'accepts_sha': True,
                 'is_verified': True,
             },
             {
@@ -87,7 +87,7 @@ class Command(BaseCommand):
                 'town': 'Mombasa',
                 'phone': '041-2314201',
                 'emergency_available': True,
-                'accepts_nhif': True,
+                'accepts_sha': True,
                 'is_verified': True,
             },
         ]
@@ -117,7 +117,7 @@ class Command(BaseCommand):
                     'longitude': fac_data['longitude', None], 
                     'emergency_available': fac_data['emergency_available'],
                     'ambulance_available': fac_data.get('ambulance_available', False),
-                    'accepts_nhif': fac_data['accepts_nhif'],
+                    'accepts_sha': fac_data['accepts_sha'],
                     'is_verified': fac_data['is_verified'],
                 }
             )

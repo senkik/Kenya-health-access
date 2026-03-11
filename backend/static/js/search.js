@@ -9,7 +9,7 @@ const elements = {
     searchInput: document.getElementById('searchInput'),
     countySelect: document.getElementById('countySelect'),
     facilityTypeSelect: document.getElementById('facilityTypeSelect'),
-    nhifFilter: document.getElementById('nhifFilter'),
+    shaFilter: document.getElementById('shaFilter'),
     sortSelect: document.getElementById('sortSelect'),
     facilitiesContainer: document.getElementById('facilitiesContainer'),
     pagination: document.getElementById('pagination'),
@@ -89,8 +89,8 @@ async function searchFacilities(page = 1) {
         params.append('facility_type', elements.facilityTypeSelect.value);
     }
 
-    if (elements.nhifFilter.value) {
-        params.append('accepts_nhif', elements.nhifFilter.value);
+    if (elements.shaFilter && elements.shaFilter.value) {
+        params.append('accepts_sha', elements.shaFilter.value);
     }
 
     // Sorting
@@ -172,7 +172,7 @@ function displayFacilities(data) {
                     ` : ''}
                     
                     <div style="margin: 1rem 0;">
-                        ${facility.accepts_nhif ? '<span class="badge badge-success">Accepts NHIF</span>' : ''}
+                        ${facility.accepts_sha ? '<span class="badge badge-success">Accepts SHA</span>' : ''}
                         ${facility.emergency_available ? '<span class="badge badge-warning">Emergency Services</span>' : ''}
                         ${facility.is_verified ? '<span class="badge badge-primary">✓ Verified</span>' : ''}
                     </div>
@@ -255,7 +255,7 @@ function resetFilters() {
     elements.searchInput.value = '';
     elements.countySelect.value = '';
     elements.facilityTypeSelect.value = '';
-    elements.nhifFilter.value = '';
+    if (elements.shaFilter) elements.shaFilter.value = '';
     elements.sortSelect.value = 'name';
 
     searchFacilities(1);

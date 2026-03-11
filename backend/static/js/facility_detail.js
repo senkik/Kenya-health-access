@@ -76,7 +76,7 @@ function displayFacilityDetails(facility) {
             
             <div style="text-align: right;">
                 ${facility.is_verified ? '<div class="meta-item">✓ Verified Facility</div>' : ''}
-                ${facility.accepts_nhif ? '<div class="meta-item">✅ Accepts NHIF</div>' : ''}
+                ${facility.accepts_sha ? '<div class="meta-item">✅ Accepts SHA</div>' : ''}
                 ${facility.emergency_available ? '<div class="meta-item">🚨 Emergency Services</div>' : ''}
             </div>
         </div>
@@ -190,9 +190,9 @@ function displayFacilityDetails(facility) {
                 <h3>Insurance & Verification</h3>
                 
                 <div style="margin: 1rem 0;">
-                    <p><strong>NHIF Accepted:</strong> 
-                        ${facility.accepts_nhif ? '✅ Yes' : '❌ No'}
-                        ${facility.nhif_code ? ` (Code: ${facility.nhif_code})` : ''}
+                    <p><strong>SHA Accepted:</strong> 
+                        ${facility.accepts_sha ? '✅ Yes' : '❌ No'}
+                        ${facility.sha_code ? ` (Code: ${facility.sha_code})` : ''}
                     </p>
                     
                     <p><strong>Facility Verified:</strong> 

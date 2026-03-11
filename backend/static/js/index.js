@@ -51,7 +51,7 @@ function displayFacilities(facilities) {
             <p>📍 ${facility.county} ${facility.town ? ', ' + facility.town : ''}</p>
             <p>📞 ${facility.phone || 'Phone not available'}</p>
             <p>${facility.emergency_available ? '🚨 Emergency Services Available' : ''}</p>
-            <p>${facility.accepts_nhif ? '✅ Accepts NHIF' : ''}</p>
+            <p>${facility.accepts_sha ? '✅ Accepts SHA' : ''}</p>
             <small>Type: ${facility.facility_type?.name || 'Healthcare'}</small>
         `;
         container.appendChild(card);
