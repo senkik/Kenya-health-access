@@ -31,4 +31,4 @@ africastalking>=1.2.0
 pyngrok>=7.0.0
 
 # Gunicorn
-echo gunicorn==21.2.0 >> requirements.txt
+gunicorn==21.2.0
