@@ -220,7 +220,7 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 ALLOWED_HOSTS = [
-    'kenya-health-api.onrender.com',
+    'https://kenya-health-access.onrender.com',
     '.onrender.com',
     'localhost',
     '127.0.0.1'
