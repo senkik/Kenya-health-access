@@ -29,3 +29,6 @@ africastalking>=1.2.0
 
 # Development & Tunneling
 pyngrok>=7.0.0
+
+# Gunicorn
+echo gunicorn==21.2.0 >> requirements.txt
