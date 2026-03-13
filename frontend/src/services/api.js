@@ -20,21 +20,40 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true,
+    withCredentials: false, // Set to false as requested for public endpoints
 });
 
-// Add error logging interceptor
+// Add error logging and handling interceptor
 api.interceptors.response.use(
     (response) => response,
     (error) => {
+        let errorMessage = 'Unable to load data. Please try again later.';
+        
+        if (error.response) {
+            // Server responded with a status code outside the 2xx range
+            const { status } = error.response;
+            if (status === 404) {
+                errorMessage = 'API endpoint not found. Check URL configuration.';
+            } else if (status === 500) {
+                errorMessage = 'Server error. Check backend logs.';
+            } else {
+                errorMessage = `HTTP error ${status}`;
+            }
+        } else if (error.request) {
+            // The request was made but no response was received
+            errorMessage = 'Network error. Check if backend is running or CORS settings.';
+        }
+
         console.error('API Error:', {
-            url: error.config?.url,
-            method: error.config?.method,
+            message: errorMessage,
             status: error.response?.status,
+            url: error.config?.url,
             data: error.response?.data,
-            message: error.message
+            originalError: error.message
         });
-        return Promise.reject(error);
+
+        // You could also add a toast notification or state update here if you have a global error handler
+        return Promise.reject(new Error(errorMessage));
     }
 );
 
