@@ -40,3 +40,8 @@ celerybeat-schedule*
 facility_data/
 *.sqlite3
 .conda/
+
+# Database Dumps and Pitch materials
+*.sql
+*.dump
+pitch_materials/
