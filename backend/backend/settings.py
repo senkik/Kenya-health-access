@@ -219,8 +219,10 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 ALLOWED_HOSTS = [
-    'https://kenya-health-access.onrender.com',
+    'kenya-health-api.onrender.com',
     '.onrender.com',
     'localhost',
     '127.0.0.1'

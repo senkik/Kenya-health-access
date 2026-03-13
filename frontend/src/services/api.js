@@ -1,7 +1,18 @@
 import axios from 'axios';
 
-// Base API URL - adjust based on environment
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// detect environment for API URL
+const getBaseURL = () => {
+    if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+    
+    // If we're on Vercel or any non-localhost environment, use the Render backend
+    if (typeof window !== 'undefined' && !window.location.hostname.includes('localhost')) {
+        return 'https://kenya-health-api.onrender.com/api';
+    }
+    
+    return 'http://localhost:8000/api';
+};
+
+const API_BASE_URL = getBaseURL();
 
 // Create axios instance with default config
 const api = axios.create({
@@ -11,6 +22,21 @@ const api = axios.create({
     },
     withCredentials: true,
 });
+
+// Add error logging interceptor
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.error('API Error:', {
+            url: error.config?.url,
+            method: error.config?.method,
+            status: error.response?.status,
+            data: error.response?.data,
+            message: error.message
+        });
+        return Promise.reject(error);
+    }
+);
 
 // API endpoints
 export const facilityAPI = {
