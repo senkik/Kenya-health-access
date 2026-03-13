@@ -202,6 +202,8 @@ SPECTACULAR_SETTINGS = {
 CSRF_TRUSTED_ORIGINS = [
     'https://sphygmographic-unrising-farah.ngrok-free.dev',
     'https://*.ngrok-free.dev',
+    'https://kenya-health-access.vercel.app',
+    'https://kenya-health-api.onrender.com',
 ]
 
 # Security settings for ngrok
@@ -223,3 +225,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1'
 ]
+
+SESSION_COOKIE_SAMESITE = 'None'  # Only if using cross-site cookies
+SESSION_COOKIE_SECURE = True      # Required for SameSite=None
+CSRF_COOKIE_SAMESITE = 'None'
+CSRF_COOKIE_SECURE = True
