@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
 import uuid
 from locations.models import County
 
@@ -55,6 +56,15 @@ class Facility(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
     
+    # Add location field for geospatial queries
+    location = gis_models.PointField(srid=4326, null=True, blank=True)
+    
+    def save(self, *args, **kwargs):
+        if self.latitude and self.longitude:
+            from django.contrib.gis.geos import Point
+            self.location = Point(float(self.longitude), float(self.latitude))
+        super().save(*args, **kwargs)
+
     # Real-time availability
     AVAILABILITY_CHOICES = [
         ('available', 'Available'),

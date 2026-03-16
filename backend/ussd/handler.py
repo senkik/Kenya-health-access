@@ -7,7 +7,11 @@ from datetime import datetime
 from django.db.models import Q
 from facilities.models import Facility, County, Service
 from content.models import HealthTip
-from utils.sms_service import send_sms
+from utils.sms import SMSService
+from .tasks import process_location_request
+
+# Initialize SMS Service
+sms_service = SMSService()
 
 
 class USSDHandler:
@@ -38,9 +42,10 @@ class USSDHandler:
         self.session['menu_level'] = 'main'
         return """CON Karibu HudumaAfya Kenya
 1. Tafuta Hospitali/Kliniki
-2. Ushauri wa Afya
-3. Nambari za Dharura
-4. Kuhusu Sisi
+2. Tafuta karibu nami
+3. Ushauri wa Afya
+4. Nambari za Dharura
+5. Kuhusu Sisi
 
 Chagua nambari:"""
     
@@ -51,11 +56,16 @@ Chagua nambari:"""
             self.session['search_step'] = 1
             return self.search_menu()
         elif last_input == "2":
+            # Queue location request
+            phone_number = self.session.get('phone_number')
+            process_location_request.delay(phone_number)
+            return "END Tunaangalia eneo lako... tafadhali subiri. Utapokea SMS ndani ya sekunde 30."
+        elif last_input == "3":
             self.session['menu_level'] = 'health_tips'
             return self.health_tips_menu()
-        elif last_input == "3":
-            return self.emergency_numbers()
         elif last_input == "4":
+            return self.emergency_numbers()
+        elif last_input == "5":
             return self.about_us()
         else:
             return "END Chaguo sio sahihi. Tafadhali jaribu tena."
@@ -224,7 +234,7 @@ Chagua nambari:"""
             f"Hali ya sasa: {status_str}\n\n"
             "Asante kwa kutumia HudumaAfya Kenya."
         )
-        send_sms(phone, message)
+        sms_service.send_sms(phone, message)
 
     def format_facility_details(self, facility):
         """Format facility details for USSD"""

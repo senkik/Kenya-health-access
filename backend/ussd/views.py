@@ -6,7 +6,6 @@ import json
 import redis
 from datetime import datetime, timedelta
 from .handler import USSDHandler, create_session 
-from utils.sms_service import send_sms
 
 # Initialize Redis for session storage (optional but recommended)
 try:

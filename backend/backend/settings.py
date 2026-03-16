@@ -14,12 +14,30 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
+# GeoDjango / GDAL Setup
+if os.name == 'nt':  # Windows
+    OSGEO4W_ROOT = os.environ.get('OSGEO4W_ROOT', r"C:\OSGeo4W")
+    if os.path.isdir(OSGEO4W_ROOT):
+        os.environ['PATH'] = os.path.join(OSGEO4W_ROOT, 'bin') + os.pathsep + os.environ['PATH']
+        # Try to find the dlls
+        for ver in ['309', '308', '307', '306', '305', '']:
+            gdal_path = os.path.join(OSGEO4W_ROOT, 'bin', f'gdal{ver}.dll')
+            if os.path.isfile(gdal_path):
+                GDAL_LIBRARY_PATH = gdal_path
+                break
+        GEOS_LIBRARY_PATH = os.path.join(OSGEO4W_ROOT, 'bin', 'geos_c.dll')
+else:  # Linux (Render)
+    GDAL_LIBRARY_PATH = os.environ.get('GDAL_LIBRARY_PATH')
+    GEOS_LIBRARY_PATH = os.environ.get('GEOS_LIBRARY_PATH')
+
 NGROK_URL = os.getenv('NGROK_URL', 'sphygmographic-unrising-farah.ngrok-free.dev')
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
 
 ALLOWED_HOSTS = [
     'localhost',
+    'kenya-health-api.onrender.com',
+    '.onrender.com',
     '127.0.0.1',
     'sphygmographic-unrising-farah.ngrok-free.dev',  # Add this
     '.ngrok-free.dev',  # Allow all ngrok domains
@@ -41,6 +59,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_spectacular',
     'django_celery_beat',
+    'django.contrib.gis',
     # Local apps
     'facilities',
     'locations',
@@ -261,3 +280,24 @@ SESSION_COOKIE_SAMESITE = 'None'  # Only if using cross-site cookies
 SESSION_COOKIE_SECURE = True      # Required for SameSite=None
 CSRF_COOKIE_SAMESITE = 'None'
 CSRF_COOKIE_SECURE = True
+
+# Operator API Keys (add to .env)
+SAFARICOM_API_KEY = os.getenv('SAFARICOM_API_KEY')
+SAFARICOM_API_SECRET = os.getenv('SAFARICOM_API_SECRET')
+AIRTEL_API_KEY = os.getenv('AIRTEL_API_KEY')
+TELKOM_API_KEY = os.getenv('TELKOM_API_KEY')
+OPERATOR_SECRETS = {
+    'safaricom': SAFARICOM_API_SECRET,
+    'telkom': os.getenv('TELKOM_API_SECRET'),
+}
+
+# Africa's Talking for SMS
+AT_USERNAME = os.getenv('AT_USERNAME', 'sandbox')
+AT_API_KEY = os.getenv('AT_API_KEY')
+AFRICASTALKING_USERNAME = AT_USERNAME
+AFRICASTALKING_API_KEY = AT_API_KEY
+SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', 'HUDUMA')
+
+# Celery for async tasks
+CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER', 'False') == 'True'
+USE_DEMO_LOCATION = os.getenv('USE_DEMO_LOCATION', 'False') == 'True'
