@@ -26,10 +26,20 @@ services:
           type: redis
           name: kenya-health-cache
           property: connectionString
+      - key: SECRET_KEY
+        generateValue: true
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
 
 databases:
   - name: kenya-health-db
     plan: free
-    # PostGIS often requires a paid plan on some providers, 
-    # but Render's standard pg image usually includes it.
-    # verify extension 'postgis' is created.
+    ipAllowList: [] # Only allow internal connections
+
+services:
+  - type: redis
+    name: kenya-health-cache
+    plan: free
+    ipAllowList: [] # Only allow internal connections

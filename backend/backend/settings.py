@@ -2,6 +2,7 @@
 import os
 from pathlib import Path
 from dotenv import load_dotenv
+import dj_database_url
 
 # Loading environment variables
 load_dotenv()
@@ -32,17 +33,18 @@ else:  # Linux (Render)
 
 NGROK_URL = os.getenv('NGROK_URL', 'sphygmographic-unrising-farah.ngrok-free.dev')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS').split(',')
-
-ALLOWED_HOSTS = [
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else []
+ALLOWED_HOSTS += [
     'localhost',
     'kenya-health-api.onrender.com',
     '.onrender.com',
     '127.0.0.1',
-    'sphygmographic-unrising-farah.ngrok-free.dev',  # Add this
-    '.ngrok-free.dev',  # Allow all ngrok domains
-    '.ngrok.io',        # For other ngrok URLs
+    'sphygmographic-unrising-farah.ngrok-free.dev',
+    '.ngrok-free.dev',
+    '.ngrok.io',
 ]
+# Unique items
+ALLOWED_HOSTS = list(set([h for h in ALLOWED_HOSTS if h]))
 
 
 # Application
@@ -100,18 +102,17 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Database
-# Use PostgreSQL if configured, otherwise fall back to SQLite
-if os.getenv('USE_POSTGRES') == 'True':
+# Use PostgreSQL/PostGIS if configured, otherwise fall back to SQLite
+if os.getenv('USE_POSTGRES') == 'True' or os.getenv('DATABASE_URL'):
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME', 'kenya_health_access'),
-            'USER': os.getenv('DB_USER', 'postgres'),
-            'PASSWORD': os.getenv('DB_PASSWORD', 'IamHim@123'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-        }
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
+    # For GeoDjango, we MUST use the postgis engine
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 else:
     DATABASES = {
         'default': {

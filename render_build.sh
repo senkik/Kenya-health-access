@@ -6,7 +6,11 @@ set -o errexit
 pip install -r backend/requirements.txt
 
 # Run migrations and collect static
-# We assume we are in the root directory here
 cd backend
 python manage.py collectstatic --no-input
+
+# Try to create postgis extension if it doesn't exist
+# This requires the database user to have superuser or create extension privileges
+python manage.py shell -c "from django.db import connection; cursor = connection.cursor(); cursor.execute('CREATE EXTENSION IF NOT EXISTS postgis;')" || true
+
 python manage.py migrate
