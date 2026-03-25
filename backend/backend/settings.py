@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import dj_database_url
+from urllib.parse import urlparse
 
 # Loading environment variables
 load_dotenv()
@@ -108,8 +109,13 @@ if os.getenv('USE_POSTGRES') == 'True' or os.getenv('DATABASE_URL'):
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
             conn_max_age=600,
+            ssl_require=True,
             conn_health_checks=True,
         )
+    }
+elif 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.parse(os.environ['DATABASE_URL'])
     }
     # For GeoDjango, we MUST use the postgis engine
     DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
@@ -301,4 +307,4 @@ SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', 'HUDUMA')
 
 # Celery for async tasks
 CELERY_TASK_ALWAYS_EAGER = os.getenv('CELERY_TASK_ALWAYS_EAGER', 'False') == 'True'
-USE_DEMO_LOCATION = os.getenv('USE_DEMO_LOCATION', 'False') == 'True'
+USE_DEMO_LOCATION = os.getenv('USE_DEMO_LOCATION', 'False') == 'True'
