@@ -165,7 +165,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Africa's Talking Configuration
 AT_USERNAME = os.getenv('AT_USERNAME', 'sandbox')
 AT_API_KEY = os.getenv('AT_API_KEY', 'atsk_b8d731cae5157044bda8513bc68c4d304a9c5a131c7974a8c38696a55662561c35c624a2')
-
+SMS_SENDER_ID = os.getenv('SMS_SENDER_ID', 'KENYAHEALTH')
 # Redis Cache Configuration
 if os.getenv('USE_REDIS') == 'True':
     CACHES = {
