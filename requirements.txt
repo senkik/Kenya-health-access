@@ -4,7 +4,6 @@ djangorestframework>=3.14.0
 
 # Database
 psycopg2-binary>=2.9.0       # PostgreSQL adapter
-django-contrib-postgres       # PostgreSQL specific features
 
 # Caching
 redis>=5.0.0
@@ -32,3 +31,5 @@ pyngrok>=7.0.0
 
 # Gunicorn
 gunicorn==21.2.0
+tenacity>=8.2.0
+dj-database-url>=2.1.0

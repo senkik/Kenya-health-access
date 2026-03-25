@@ -4,7 +4,6 @@ djangorestframework>=3.14.0
 
 # Database
 psycopg2-binary>=2.9.0       # PostgreSQL adapter
-django-contrib-postgres       # PostgreSQL specific features
 
 # Caching
 redis>=5.0.0
