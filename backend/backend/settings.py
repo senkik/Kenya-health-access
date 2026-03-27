@@ -18,11 +18,11 @@ DEBUG = os.environ.get('DEBUG') == 'True'
 
 # GeoDjango / GDAL Setup
 if os.name == 'nt':  # Windows
-    OSGEO4W_ROOT = os.environ.get('OSGEO4W_ROOT', r"C:\OSGeo4W")
+    OSGEO4W_ROOT = os.environ.get('OSGEO4W_ROOT', r"C:\Users\loren\AppData\Local\OSGeo4W")
     if os.path.isdir(OSGEO4W_ROOT):
         os.environ['PATH'] = os.path.join(OSGEO4W_ROOT, 'bin') + os.pathsep + os.environ['PATH']
         # Try to find the dlls
-        for ver in ['309', '308', '307', '306', '305', '']:
+        for ver in ['312', '311', '310', '309', '308', '307', '306', '305', '']:
             gdal_path = os.path.join(OSGEO4W_ROOT, 'bin', f'gdal{ver}.dll')
             if os.path.isfile(gdal_path):
                 GDAL_LIBRARY_PATH = gdal_path
@@ -108,11 +108,13 @@ if os.getenv('USE_POSTGRES') == 'True' or os.getenv('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
-            conn_max_age=600,
+            conn_max_age=0,        # Neon serverless drops idle connections; disable persistence
             ssl_require=True,
-            conn_health_checks=True,
+            conn_health_checks=False,  # Incompatible with Neon's EOF on idle connections
         )
     }
+    # For GeoDjango, we MUST use the postgis engine
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
 elif 'DATABASE_URL' in os.environ:
     DATABASES = {
         'default': dj_database_url.parse(os.environ['DATABASE_URL'])

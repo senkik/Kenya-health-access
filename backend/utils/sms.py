@@ -22,7 +22,7 @@ class SMSService:
         # Initialize Africa's Talking
         africastalking.initialize(self.username, self.api_key)
         self.sms = africastalking.SMS
-        self._check_balance()
+        # self._check_balance()
     
     def _check_balance(self):
         """Check SMS balance on startup"""
