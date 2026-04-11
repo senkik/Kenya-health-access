@@ -1,27 +1,43 @@
 """
-USSD Handler for Kenya Health Access
-Contains all USSD flow logic separated from views
+USSD Handler for Kenya Health Access - OPTIMIZED FOR SPEED
+Lazy loading prevents timeouts on Render free tier
 """
 import json
 from datetime import datetime
 from django.db.models import Q
-from facilities.models import Facility, County, Service
-from content.models import HealthTip
-from utils.sms import SMSService
-from .tasks import process_location_request
 
-# Initialize SMS Service
-sms_service = SMSService()
+# Don't import heavy models at top level - import when needed
+# from facilities.models import Facility, County, Service  # REMOVED - will import lazily
+# from content.models import HealthTip  # REMOVED - will import lazily
+# from utils.sms import SMSService  # REMOVED - will import lazily
+# from .tasks import process_location_request  # REMOVED - will import lazily
 
 
 class USSDHandler:
-    """Handles USSD session flows"""
+    """Handles USSD session flows - OPTIMIZED for speed"""
     
     def __init__(self, session):
         self.session = session
+        self._sms_service = None
+        self._facility_model = None
+    
+    def _get_sms_service(self):
+        """Lazy load SMS service - only when needed"""
+        if self._sms_service is None:
+            from utils.sms import SMSService
+            self._sms_service = SMSService()
+        return self._sms_service
+    
+    def _get_facility_model(self):
+        """Lazy load Facility model - only when needed"""
+        if self._facility_model is None:
+            from facilities.models import Facility
+            self._facility_model = Facility
+        return self._facility_model
     
     def process_input(self, text_array, last_input):
-        """Main USSD flow processor"""
+        """Main USSD flow processor - FAST PATH for main menu"""
+        # FAST PATH: Main menu requires no database or external calls
         if len(text_array) == 0:
             return self.main_menu()
         
@@ -38,7 +54,7 @@ class USSDHandler:
         return self.error_message()
     
     def main_menu(self):
-        """Main USSD Menu in Swahili"""
+        """Main USSD Menu in Swahili - PURE STRING, NO DATABASE"""
         self.session['menu_level'] = 'main'
         return """CON Karibu HudumaAfya Kenya
 1. Tafuta Hospitali/Kliniki
@@ -56,7 +72,8 @@ Chagua nambari:"""
             self.session['search_step'] = 1
             return self.search_menu()
         elif last_input == "2":
-            # Queue location request
+            # Lazy import for task - only when needed
+            from .tasks import process_location_request
             phone_number = self.session.get('phone_number')
             process_location_request.delay(phone_number)
             return "END Tunaangalia eneo lako... tafadhali subiri. Utapokea SMS ndani ya sekunde 30."
@@ -71,7 +88,7 @@ Chagua nambari:"""
             return "END Chaguo sio sahihi. Tafadhali jaribu tena."
     
     def search_menu(self):
-        """Search facility menu"""
+        """Search facility menu - PURE STRING"""
         return """CON Tafuta kwa:
 1. Jina la Kaunti
 2. Jina la Hospitali
@@ -123,17 +140,17 @@ Chagua nambari:"""
                 'timestamp': datetime.now().isoformat()
             }
             
-            # Perform actual database search
+            # Perform actual database search (now using lazy-loaded model)
             facilities = self.search_facilities(search_type, search_query)
             self.session['search_results'] = [
                 {
                     'id': fac.id,
                     'name': fac.name,
                     'phone': fac.phone or 'N/A',
-                    'county': fac.county.name,
+                    'county': fac.county.name if hasattr(fac, 'county') and fac.county else fac.county_name,
                     'town': fac.town or '',
-                    'status': fac.availability_status,
-                    'services': [s.name for s in fac.services.all()[:2]]
+                    'status': getattr(fac, 'availability_status', 'available'),
+                    'services': [s.name for s in fac.services.all()[:2]] if hasattr(fac, 'services') else []
                 }
                 for fac in facilities[:5]  # Limit to 5 for USSD
             ]
@@ -151,15 +168,19 @@ Chagua nambari:"""
         return self.error_message()
     
     def search_facilities(self, search_type, query):
-        """Search facilities in database"""
-        facilities = Facility.objects.filter(
-            is_active=True
-        )
+        """Search facilities in database - uses lazy-loaded model"""
+        Facility = self._get_facility_model()
+        
+        facilities = Facility.objects.filter(is_active=True)
         
         query = query.strip()
         
         if search_type == 'county':
-            facilities = facilities.filter(county__name__icontains=query)
+            # Handle both ForeignKey and CharField county
+            try:
+                facilities = facilities.filter(county__name__icontains=query)
+            except:
+                facilities = facilities.filter(county__icontains=query)
         elif search_type == 'facility_name':
             facilities = facilities.filter(name__icontains=query)
         elif search_type == 'service':
@@ -172,7 +193,7 @@ Chagua nambari:"""
         return facilities.order_by('name')[:10]
     
     def format_search_results(self):
-        """Format search results for USSD"""
+        """Format search results for USSD - NO DATABASE CALLS"""
         results = self.session.get('search_results', [])
         
         if not results:
@@ -187,7 +208,7 @@ Chagua nambari:"""
         }
         
         for i, fac in enumerate(results, 1):
-            icon = status_icons.get(fac['status'], '')
+            icon = status_icons.get(fac.get('status', 'available'), '')
             response += f"{i}. {fac['name']} {icon}\n"
         
         response += "\n0. Menu kuu\n"
@@ -207,7 +228,7 @@ Chagua nambari:"""
             if 0 <= idx < len(results):
                 facility = results[idx]
                 
-                # Send SMS with details automatically
+                # Send SMS with details automatically (lazy-loaded)
                 self.send_facility_sms(facility)
                 
                 return self.format_facility_details(facility)
@@ -217,13 +238,13 @@ Chagua nambari:"""
             return "END Tafadhali ingiza nambari sahihi."
     
     def send_facility_sms(self, facility):
-        """Send SMS with facility details to the user"""
+        """Send SMS with facility details to the user - uses lazy-loaded SMS service"""
         phone = self.session.get('phone_number')
         if not phone:
             return
             
         services_str = ", ".join(facility['services']) if facility['services'] else "N/A"
-        status_str = facility['status'].replace('_', ' ').title()
+        status_str = facility.get('status', 'available').replace('_', ' ').title()
         
         message = (
             f"HudumaAfya: Maelezo ya {facility['name']}\n"
@@ -234,26 +255,27 @@ Chagua nambari:"""
             f"Hali ya sasa: {status_str}\n\n"
             "Asante kwa kutumia HudumaAfya Kenya."
         )
-        sms_service.send_sms(phone, message)
+        sms = self._get_sms_service()
+        sms.send_sms(phone, message)
 
     def format_facility_details(self, facility):
-        """Format facility details for USSD"""
+        """Format facility details for USSD - PURE STRING"""
         services_str = ", ".join(facility['services'][:2]) if facility['services'] else "N/A"
-        status_str = facility['status'].replace('_', ' ').title()
+        status_str = facility.get('status', 'available').replace('_', ' ').title()
         
         return f"""END {facility['name']}
-     Kaunti: {facility['county']}
-     Mji: {facility.get('town', 'N/A')}
-     Simu: {facility['phone']}
-     Huduma: {services_str}
-     Hali ya sasa: {status_str}
+Kaunti: {facility['county']}
+Mji: {facility.get('town', 'N/A')}
+Simu: {facility['phone']}
+Huduma: {services_str}
+Hali ya sasa: {status_str}
 
 Tumekutumia maelezo haya kwa SMS hivi punde.
 
 Asante!"""
     
     def health_tips_menu(self):
-        """Health tips menu"""
+        """Health tips menu - PURE STRING"""
         return """CON Ushauri wa Afya:
 1. Afya ya Jumla
 2. Afya ya Mama na Mtoto
@@ -286,12 +308,13 @@ Chagua:"""
         return "END Chaguo sio sahihi."
     
     def get_random_health_tip(self, category):
-        """Get a random health tip from database"""
+        """Get a random health tip from database - lazy import"""
         try:
+            from content.models import HealthTip
             tip = HealthTip.objects.filter(
                 category=category,
                 is_active=True,
-                language='sw'  # Swahili tips for USSD
+                language='sw'
             ).order_by('?').first()
             
             if tip:
@@ -299,17 +322,18 @@ Chagua:"""
         except:
             pass
         
-        # Fallback tips
+        # Fallback tips - PURE STRINGS, no database
         fallback_tips = {
             'general': "Kunywa angalau lita 2 za maji kila siku kwa afya njema.",
             'maternal': "Mama mjamzito anahitaji lishe kamili na kupima uzito kila mwezi.",
             'nutrition': "Kula mboga za majani na matunda kwa rangi mbalimbali.",
+            'family_planning': "Wasiliana na kliniki ya uzazi karibu nawe kwa ushauri.",
         }
         
         return fallback_tips.get(category, "Tafadhali pitia kliniki karibu nawe kwa ushauri.")
     
     def emergency_numbers(self):
-        """Emergency numbers"""
+        """Emergency numbers - PURE STRING"""
         return """END 🚨 Nambari za Dharura:
 Polisi: 999 / 112 / 911
 Zima Moto: 999
@@ -320,7 +344,7 @@ Usisite kupiga wakati wa dharura!
 """
     
     def about_us(self):
-        """About us information"""
+        """About us information - PURE STRING"""
         return """END HudumaAfya Kenya 🇰🇪
 Tunasaidia Wakenya kupata huduma za afya karibu nao.
 
@@ -331,12 +355,12 @@ Asante kwa kuwa miongoni mwetu!
 """
     
     def error_message(self):
-        """Default error message"""
+        """Default error message - PURE STRING"""
         return "END Samahani, hitilafu imetokea. Tafadhali anza tena kwa kupiga *384*43149#"
 
 
 def create_session(session_id, phone_number):
-    """Create a new USSD session"""
+    """Create a new USSD session - FAST, no external calls"""
     return {
         'session_id': session_id,
         'phone_number': phone_number,
