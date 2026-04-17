@@ -6,13 +6,13 @@ class Command(BaseCommand):
     help = 'Check Africa\'s Talking API status'
     
     def handle(self, *args, **options):
-        self.stdout.write("🔍 Checking Africa's Talking Status...")
+        self.stdout.write("Checking Africa's Talking Status...")
         
         self.stdout.write(f"Username: {settings.AT_USERNAME}")
         self.stdout.write(f"API Key: {'*' * len(settings.AT_API_KEY) if settings.AT_API_KEY else 'NOT SET'}")
         
         if not settings.AT_API_KEY:
-            self.stdout.write(self.style.ERROR("❌ API Key not set in .env file"))
+            self.stdout.write(self.style.ERROR("API Key not set in .env file"))
             return
         
         try:
@@ -22,7 +22,7 @@ class Command(BaseCommand):
             # Fetch application data
             user_data = app.fetch_application_data()
             
-            self.stdout.write(self.style.SUCCESS("✅ Africa's Talking is working!"))
+            self.stdout.write(self.style.SUCCESS("Africa's Talking is working!"))
             self.stdout.write(f"User Data: {user_data}")
             
             # Check balance
@@ -33,4 +33,4 @@ class Command(BaseCommand):
                 self.stdout.write("Note: Could not fetch balance (sandbox limitation)")
                 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"❌ Africa's Talking error: {e}"))
+            self.stdout.write(self.style.ERROR(f"Africa's Talking error: {e}"))

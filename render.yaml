@@ -38,8 +38,13 @@ databases:
     plan: free
     ipAllowList: [] # Only allow internal connections
 
-services:
   - type: redis
     name: kenya-health-cache
     plan: free
     ipAllowList: [] # Only allow internal connections
+
+  - type: worker
+    name: celery-worker
+    env: python
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && celery -A backend worker --beat --loglevel=info

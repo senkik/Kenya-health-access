@@ -45,3 +45,6 @@ facility_data/
 *.sql
 *.dump
 pitch_materials/
+
+# Scratch
+backend/scratch/

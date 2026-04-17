@@ -32,9 +32,11 @@ class Service(models.Model):
 
 class Facility(models.Model):
     name = models.CharField(max_length=200)
+    mfl_code = models.CharField(max_length=20, blank=True, help_text="MFL facility code")
     facility_type = models.ForeignKey(FacilityType, on_delete=models.PROTECT)
     county = models.ForeignKey(County, on_delete=models.PROTECT)
     constituency = models.CharField(max_length=100, blank=True)
+    ward = models.CharField(max_length=100, blank=True)
     town = models.CharField(max_length=100, blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
@@ -52,6 +54,10 @@ class Facility(models.Model):
     opening_hours = models.TextField(blank=True)
     is_24_hours = models.BooleanField(default=False)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    mfl_uuid = models.UUIDField(null=True, blank=True, unique=True, help_text="MFL's internal UUID")
+    last_mfl_sync = models.DateTimeField(null=True, blank=True, help_text="Last sync with MFL API")
+    is_published_in_mfl = models.BooleanField(default=False, help_text="Whether MFL has published this facility")
+    is_customized = models.BooleanField(default=False, help_text="Whether we've manually enhanced this facility")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=True)
