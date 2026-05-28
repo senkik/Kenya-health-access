@@ -32,9 +32,9 @@ export const facilityAPI = {
     getNearby: (lat, lng, radius = 10) =>
         api.get('/facilities/', { params: { lat, lng, radius } }),
 
-    // Update availability status
-    updateAvailability: (id, status) =>
-        api.post(`/facilities/${id}/update_availability/`, { status }),
+    // Update availability status (uses uuid as lookup)
+    updateAvailability: (uuid, status) =>
+        api.post(`/facilities/${uuid}/update_availability/`, { status }),
 };
 
 export const countyAPI = {

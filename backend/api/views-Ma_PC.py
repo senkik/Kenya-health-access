@@ -5,6 +5,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.core.cache import cache
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
+from django.db.models import Q
 from facilities.models import Facility, Service, FacilityType, Review
 from facilities.serializers import FacilitySerializer, ServiceSerializer, FacilityTypeSerializer, ReviewSerializer
 from content.models import HealthArticle, HealthTip
@@ -64,7 +65,20 @@ class ServiceViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['category']
 
 class FacilityViewSet(viewsets.ModelViewSet):
-    """Main API for healthcare facilities"""
+    """Main API for healthcare facilities with advanced filtering.
+    
+    Supports the following query params:
+        county          - Filter by county name (exact, case-insensitive)
+        constituency    - Filter by constituency (partial, case-insensitive)
+        town            - Filter by town/area (partial, case-insensitive)
+        services        - Comma-separated service names (any match)
+        is_24_hours     - Boolean filter for 24/7 facilities
+        lat, lng, radius- PostGIS proximity search (radius in km, default 10)
+        search          - Full-text search on name, town, address, constituency
+        facility_type   - Filter by facility_type id
+        accepts_sha     - Boolean filter
+        emergency_available - Boolean filter
+    """
     queryset = Facility.objects.filter(is_active=True)
     serializer_class = FacilitySerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -75,11 +89,68 @@ class FacilityViewSet(viewsets.ModelViewSet):
     lookup_field = 'uuid'
 
     def get_queryset(self):
-        queryset = Facility.objects.filter(is_active=True)
-        # Support filtering by county name from the frontend
-        county = self.request.query_params.get('county', '')
+        queryset = Facility.objects.filter(is_active=True).select_related(
+            'facility_type', 'county'
+        ).prefetch_related('services')
+        
+        params = self.request.query_params
+
+        # --- County filter (exact, case-insensitive) ---
+        county = params.get('county', '').strip()
         if county:
             queryset = queryset.filter(county__name__iexact=county)
+
+        # --- Constituency filter (partial, case-insensitive) ---
+        constituency = params.get('constituency', '').strip()
+        if constituency:
+            queryset = queryset.filter(constituency__icontains=constituency)
+
+        # --- Town / Area filter (partial, case-insensitive) ---
+        town = params.get('town', '').strip()
+        if town:
+            queryset = queryset.filter(
+                Q(town__icontains=town) | Q(address__icontains=town)
+            )
+
+        # --- Services filter (comma-separated names, match any) ---
+        services_param = params.get('services', '').strip()
+        if services_param:
+            service_names = [s.strip() for s in services_param.split(',') if s.strip()]
+            if service_names:
+                queryset = queryset.filter(
+                    services__name__in=service_names
+                ).distinct()
+
+        # --- 24/7 filter ---
+        is_24 = params.get('is_24_hours', '').strip().lower()
+        if is_24 in ('true', '1', 'yes'):
+            queryset = queryset.filter(is_24_hours=True)
+        elif is_24 in ('false', '0', 'no'):
+            queryset = queryset.filter(is_24_hours=False)
+
+        # --- Near Me (PostGIS distance) ---
+        lat = params.get('lat', '').strip()
+        lng = params.get('lng', '').strip()
+        if lat and lng:
+            try:
+                from django.contrib.gis.geos import Point
+                from django.contrib.gis.db.models.functions import Distance
+                from django.contrib.gis.measure import D
+
+                lat_f = float(lat)
+                lng_f = float(lng)
+                radius_km = float(params.get('radius', '10'))
+
+                user_location = Point(lng_f, lat_f, srid=4326)
+                queryset = queryset.filter(
+                    location__isnull=False,
+                    location__distance_lte=(user_location, D(km=radius_km))
+                ).annotate(
+                    distance=Distance('location', user_location)
+                ).order_by('distance')
+            except (ValueError, TypeError):
+                pass  # silently ignore bad coordinates
+
         return queryset
 
     @action(detail=False, methods=['get'])
@@ -88,7 +159,7 @@ class FacilityViewSet(viewsets.ModelViewSet):
         query = request.query_params.get('q', '')
         county = request.query_params.get('county', '')
 
-        facilities = Facility.objects.filter(is_active=True)
+        facilities = self.get_queryset()
 
         if query:
             facilities = facilities.filter(name__icontains=query)
@@ -111,12 +182,39 @@ class FacilityViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        facilities = Facility.objects.filter(is_active=True, county__name__iexact=county)
+        facilities = self.get_queryset().filter(county__name__iexact=county)
         serializer = self.get_serializer(facilities, many=True)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def constituencies(self, request):
+        """Return distinct constituency values for dropdowns."""
+        values = (
+            Facility.objects
+            .filter(is_active=True)
+            .exclude(constituency='')
+            .values_list('constituency', flat=True)
+            .distinct()
+            .order_by('constituency')
+        )
+        return Response(list(values))
+
+    @action(detail=False, methods=['get'])
+    def towns(self, request):
+        """Return distinct town values for autocomplete."""
+        q = request.query_params.get('q', '').strip()
+        qs = (
+            Facility.objects
+            .filter(is_active=True)
+            .exclude(town='')
+        )
+        if q:
+            qs = qs.filter(town__icontains=q)
+        values = qs.values_list('town', flat=True).distinct().order_by('town')[:50]
+        return Response(list(values))
+
     @action(detail=True, methods=['post'])
-    def update_availability(self, request, pk=None):
+    def update_availability(self, request, uuid=None):
         """Update facility availability status"""
         facility = self.get_object()
         status_value = request.data.get('status')

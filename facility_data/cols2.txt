@@ -1,0 +1,25 @@
+Facility id
+Facility Name
+Province
+County
+District
+Type
+Owner
+Location
+Sub Location
+Description of Location
+Constituency
+Nearest Town
+Beds
+Official Landline
+Official Mobile
+Official Email
+Official Address
+Official Alternate No
+Town
+Post Code
+In Charge
+Job Title of in Charge
+Open 24 Hours
+Open Weekends
+Operational Status
