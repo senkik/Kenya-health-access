@@ -105,33 +105,22 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # Use PostgreSQL/PostGIS if configured, otherwise fall back to SQLite
-if os.getenv('USE_POSTGRES') == 'True' or os.getenv('DATABASE_URL'):
+if os.getenv('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
-            conn_max_age=0,        # Neon serverless drops idle connections; disable persistence
-            ssl_require=True,
-            conn_health_checks=False,  # Incompatible with Neon's EOF on idle connections
-        )
-    }
-    # For GeoDjango, we MUST use the postgis engine
-    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-elif 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.parse(os.environ['DATABASE_URL'])
-    }
-    # For GeoDjango, we MUST use the postgis engine
-    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
-else:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default='sqlite:///db.sqlite3',
             conn_max_age=600,
             conn_health_checks=True,
         )
+    }
+    DATABASES['default']['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
-
-
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
