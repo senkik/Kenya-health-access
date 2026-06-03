@@ -30,7 +30,7 @@ class ReviewAdmin(admin.ModelAdmin):
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
     list_display = ['name', 'county', 'facility_type', 'availability_status', 'is_verified', 'average_rating']
-    list_filter = ['county', 'is_verified', 'availability_status', 'accepts_nhif']
+    list_filter = ['county', 'is_verified', 'availability_status', 'accepts_sha']
     search_fields = ['name', 'county__name', 'phone']
     filter_horizontal = ['services']
     readonly_fields = ['last_status_update', 'uuid']
@@ -46,7 +46,7 @@ class FacilityAdmin(admin.ModelAdmin):
             'fields': ('availability_status', 'last_status_update', 'opening_hours', 'is_24_hours')
         }),
         ('Services & Features', {
-            'fields': ('services', 'emergency_available', 'ambulance_available', 'accepts_nhif', 'nhif_code')
+            'fields': ('services', 'emergency_available', 'ambulance_available', 'accepts_sha', 'sha_code')
         }),
         ('Contact Info', {
             'fields': ('phone', 'email', 'website')
