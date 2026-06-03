@@ -2,16 +2,19 @@ from django.contrib import admin
 # pyrefly: ignore [missing-import]
 from .models import FacilityType, Service, Facility, Review
 
+
 @admin.register(FacilityType)
 class FacilityTypeAdmin(admin.ModelAdmin):
     list_display = ['name', 'icon']
     search_fields = ['name']
+
 
 @admin.register(Service)
 class ServiceAdmin(admin.ModelAdmin):
     list_display = ['name', 'category']
     list_filter = ['category']
     search_fields = ['name']
+
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -22,11 +25,14 @@ class ReviewAdmin(admin.ModelAdmin):
 
     def approve_reviews(self, request, queryset):
         queryset.update(is_approved=True)
+
     approve_reviews.short_description = "Approve selected reviews"
 
     def reject_reviews(self, request, queryset):
         queryset.update(is_approved=False)
+
     reject_reviews.short_description = "Reject/Hide selected reviews"
+
 
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
@@ -35,7 +41,7 @@ class FacilityAdmin(admin.ModelAdmin):
     search_fields = ['name', 'county__name', 'phone']
     filter_horizontal = ['services']
     readonly_fields = ['last_status_update', 'uuid']
-    
+
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'facility_type', 'is_verified', 'verified_date', 'uuid')
